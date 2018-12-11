@@ -110,5 +110,46 @@ describe('Blog API Resource', function() {
 	//test POST endpoint
 	describe('POST endpoint', function(){
 
+		it('should create a new post', function(){
+
+			const newPost = generatePostData();
+
+			return chai.request(app)
+				.post('/posts')
+				.send(newPost)
+				.then(function(res) {
+					expect(res).to.have.status(201);
+					expect(res).to.be.json;
+					expect(res.body).to.be.a('object');
+					expect(res.body).to.include.keys('id', 'title', 'author', 'content', 'created');
+					expect(res.body.title).to.equal(newPost.title);
+					expect(res.body.content).to.equal(newPost.content);
+					expect(res.body.created).to.equal(newPost.created);
+					expect(res.body.id).to.not.be(null);
+
+					return Post.findById(res.body.id);
+				})
+				.then(function(blogpost) {
+					expect(blogpost.body.id).to.equal(newPost.id);
+					expect(blogpost.body.author.firstName).to.equal(newPost.author.firstName);
+					expect(blogpost.body.author.lastName).to.equal(newPost.author.lastName);
+					expect(blogpost.body.content).to.equal(newPost.content);
+					expect(blogpost.body.title).to.equal(newPost.title);
+					expect(blogpost.body.created).to.equal(newPost.created);
+				});
+		});
+	});
+
+	//test PUT endpoint
+	describe('PUT endpoint', function() {
+
+		it('should update requested fields', function(){
+
+			const updateData = {
+				title: 'New Title WOO!',
+				content: 'Here is come content for ya, chumps'
+			};
+			
+		});
 	});
 });
