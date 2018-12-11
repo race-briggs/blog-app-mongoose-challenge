@@ -149,7 +149,48 @@ describe('Blog API Resource', function() {
 				title: 'New Title WOO!',
 				content: 'Here is come content for ya, chumps'
 			};
-			
+
+			return Post
+				.findOne()
+				.then(function(blogpost){
+					updateData.id = blogpost.id;
+
+					return chai.request(app)
+						.put('/posts')
+						.send(updateData);
+				})
+				.then(function(res) {
+					expect(res).to.have.status(204);
+
+					return Post
+						.findById(updateData.id);
+				})
+				.then(function(blogpost) {
+					expect(blogpost.title).to.equal(updateData.title);
+					expect(blogpost.content).to.equal(updateData.content);
+				});
+		});
+	});
+
+	//test DELETE endpoint
+	describe('DELETE endpoint', function() {
+
+		it('should remove a blog post', function() {
+			const targetPost;
+
+			return Post
+				.findOne()
+				.then(function(resPost) {
+					targetPost = resPost;
+					return chai.request(app).delete(`/posts/${targetPost.id}`);
+				})
+				.then(function(res) {
+					expect(res).to.have.status(204);
+					return Post.findById(targetPost.id);
+				})
+				.then(function(finalRes) {
+					expect(finalEes).to.be(null);
+				});
 		});
 	});
 });
