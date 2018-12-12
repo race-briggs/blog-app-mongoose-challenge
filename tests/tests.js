@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 const expect = chai.expect;
 
-const {Post, Author} = require('../models');
+const {BlogPost, Author} = require('../models');
 const {app, runServer, closeServer} = require('../server');
 const {TEST_DATABASE_URL} = require('../config');
 
@@ -20,7 +20,7 @@ function seedPostData() {
 	for(let i = 0; i<10; i++){
 		seedData.push(generatePostData());
 	};
-	return Post.insertMany(seedData);
+	return BlogPost.insertMany(seedData);
 };
 
 function generatePostTitle() {
@@ -74,36 +74,37 @@ describe('Blog API Resource', function() {
 					res = _res;
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
-					expect(res.body.blogposts).to.have.lengthOf.at.least(1);
-					return Post.count();
+					expect(res.body).to.have.lengthOf.at.least(1);
+					return BlogPost.count();
 				})
 				.then(function(count){
-					expect(res.body.blogposts).to.have.lengthOf(count);
+					expect(res.body).to.have.lengthOf(count);
 				});
 		});
 
 		it('should return posts with correct fields', function(){
 			let resPost;
-			return chat.request(app)
+			return chai.request(app)
 				.get('/posts')
 				.then(function(res) {
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
-					expect(res.body.blogposts).to.be.a('array');
+					expect(res.body).to.be.a('array');
 
-					res.body.blogposts.forEach(function(blogpost){
+					res.body.forEach(function(blogpost){
 						expect(blogpost).to.be.a('object');
 						expect(blogpost).to.include.keys('id', 'author', 'title', 'content', 'created');
 					});
-					resPost = res.body.blogposts[0];
-					return Post.findById(resPost.id);
+					resPost = res.body[0];
+					return BlogPost.findById(resPost.id);
 				})
 				.then(function(blogpost){
 					expect(resPost.id).to.equal(blogpost.id);
-					expect(resPost.author).to.equal(blogpost.author);
+					expect(resPost.author).to.equal(`${blogpost.author.firstName} ${blogpost.author.lastName}`);
 					expect(resPost.content).to.equal(blogpost.content);
 					expect(resPost.title).to.equal(blogpost.title);
-					expect(resPost.created).to.equal(blogpost.created);
+					console.log(resPost.created, blogpost.created);
+					expect(new Date(resPost.created)).to.deep.equal(new Date(blogpost.created));
 				});
 		});
 	});
@@ -118,16 +119,17 @@ describe('Blog API Resource', function() {
 				.post('/posts')
 				.send(newPost)
 				.then(function(res) {
+					console.log(newPost, res.body);
 					expect(res).to.have.status(201);
 					expect(res).to.be.json;
 					expect(res.body).to.be.a('object');
 					expect(res.body).to.include.keys('id', 'title', 'author', 'content', 'created');
 					expect(res.body.title).to.equal(newPost.title);
 					expect(res.body.content).to.equal(newPost.content);
-					expect(res.body.created).to.equal(newPost.created);
+					expect(new Date(res.body.created)).to.deep.equal(new Date(newPost.created));
 					expect(res.body.id).to.not.be(null);
 
-					return Post.findById(res.body.id);
+					return BlogPost.findById(res.body.id);
 				})
 				.then(function(blogpost) {
 					expect(blogpost.body.id).to.equal(newPost.id);
@@ -135,7 +137,7 @@ describe('Blog API Resource', function() {
 					expect(blogpost.body.author.lastName).to.equal(newPost.author.lastName);
 					expect(blogpost.body.content).to.equal(newPost.content);
 					expect(blogpost.body.title).to.equal(newPost.title);
-					expect(blogpost.body.created).to.equal(newPost.created);
+					expect(new Date(blogpost.body.created)).to.deep.equal(new Date(newPost.created));
 				});
 		});
 	});
@@ -150,7 +152,7 @@ describe('Blog API Resource', function() {
 				content: 'Here is come content for ya, chumps'
 			};
 
-			return Post
+			return BlogPost
 				.findOne()
 				.then(function(blogpost){
 					updateData.id = blogpost.id;
@@ -162,7 +164,7 @@ describe('Blog API Resource', function() {
 				.then(function(res) {
 					expect(res).to.have.status(204);
 
-					return Post
+					return BlogPost
 						.findById(updateData.id);
 				})
 				.then(function(blogpost) {
@@ -176,20 +178,21 @@ describe('Blog API Resource', function() {
 	describe('DELETE endpoint', function() {
 
 		it('should remove a blog post', function() {
-			const targetPost;
+			let targetPost;
 
-			return Post
+			return BlogPost
 				.findOne()
 				.then(function(resPost) {
 					targetPost = resPost;
+					console.log(targetPost);
 					return chai.request(app).delete(`/posts/${targetPost.id}`);
 				})
 				.then(function(res) {
 					expect(res).to.have.status(204);
-					return Post.findById(targetPost.id);
+					return BlogPost.findById(targetPost.id);
 				})
 				.then(function(finalRes) {
-					expect(finalEes).to.be(null);
+					expect(finalRes).to.be(null);
 				});
 		});
 	});
