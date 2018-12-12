@@ -2,3 +2,10 @@ language: node_js
 node_js: node
 services:
 - mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: pVA8+vZgTy2N7bnkdT6MQxvOW1h9L7HWLXWmhNaEtdoOp45eANciXGBZ7tLhDnPzn7IaBhbt/WnsvYNu3L5+pDqnLsO/xRPutBkDuaUwAe7ijF0KtG+X2WHXZx2iog9cTda0w3GJVCATOHpvHxGlhwWD4R1AIAT5RriKLRub2tjF4SfjKiTLmVzUfdJIEtNxYJ2JQm71uuSLnppZ13I8cIJYiT+07JXBEjmJAOEdXTRNGSzER0LIigeFOGVn2geIucBoDOLQ6s0JbkuLNfB2VT34g3i9k+4D0Y7mX7txSLEZPmcFwC1I6kqVml5htzl6MCPytuPny3UDhI9Ww3zL7fugFxcq23zLGYyG+sTfXDz3JR3eR4Jt859Y6gDswR2xggTgcYg44ZebjKnH3CeOmXVvsM1Pe5y/WlGZXIeMaSjf6HjtEZfh0qnd3S+2buLchaugM3/HTI+4TSEG0hxCO26n2MhPT+Pc2zQMh2qTfT2zIsKMdbytTjo+or+7Pii28TcLDF4PvX2qWv8xLvn9IJPY/AhradhwJL5jwg2zCw+yUg4+T9DDLes9Y9mpyceqNrJ4jXDxYx5dmReiCWjquG2j4quhGWEpW8cUjStKz0lL9eb2JWcLQUSQpCR0i5PFUjI3UmyrG4AdE1Q/eiOtH7eoUoDZcx3s/YLXhAe1KSM=
+  app: enigmatic-harbor-86126
+  on: 
+    repo: race-briggs/blog-app-mongoose-challenge
